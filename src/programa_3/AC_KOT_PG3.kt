@@ -9,78 +9,41 @@ fun main () {
 }
 
 fun comprobarSintaxis(expresion: String): Boolean {
-    val corchetes: MutableList<Boolean> = mutableListOf();
-    val parentesis: MutableList<Boolean> = mutableListOf();
-    val llaves: MutableList<Boolean> = mutableListOf();
+    val delimitadoresAbiertos: MutableList<Char> = mutableListOf();
 
-    for (i in 0..expresion.length - 1) {
-        when(expresion[i]) {
-            '[' -> {
-                corchetes.add(true);
+    for (i in expresion) {
+        when(i) {
+            '[', '(', '{' -> {
+                delimitadoresAbiertos.add(i);
             }
 
-            '(' -> {
-                parentesis.add(true)
-            }
+            ']', ')', '}' -> {
+                // Cuando se encuentre un delimitador cerrado en la posicion actual lo comparara con el ultimo delimitador abierto (ultimo de la lista de delimitadoresAbiertos)
+                // Si la lista esta vacia y se intenta comparar significara que hay mas delimitadores cerrados que abiertos
+                if (delimitadoresAbiertos.none() || !comprobarAbiertoConCerrado(delimitadoresAbiertos.last(), i)) {
+                    return false;
+                }
 
-            '{' -> {
-                llaves.add(true)
-            }
-
-            ']' -> {
-                corchetes.add(false)
-            }
-
-            ')' -> {
-                parentesis.add(false)
-            }
-
-            '}' -> {
-                llaves.add(false)
+                // Una vez la comprobacion fue exitosa (comprobarAbiertoConCerrado() = true) significara
+                // que el ultimo delimitador abierto encontrado con el primer delimitador cerrado encontrado son del mismo "tipo"
+                delimitadoresAbiertos.removeAt(delimitadoresAbiertos.size - 1);
             }
         }
-
     }
 
-    if (comprobarDelimitador(corchetes) && comprobarDelimitador(parentesis) && comprobarDelimitador(llaves)) {
-        return true;
-    }
-
-    return false;
+    // Si la lista esta vacia (Ningun delimitador abierto sin comparar ha quedado pendiente) retornara true
+    return delimitadoresAbiertos.none();
 }
 
-fun comprobarDelimitador(delimitador: MutableList<Boolean>): Boolean {
-    // Si la lista que se da no tiene ningun valor querra decir que en la expresion no se encontro un delimitador de tipo | (, {, [ |
-    if (delimitador.none()) {
+/**
+ * Abierto -> Ultimo delimitador abierto encontrado
+ * Cerrado -> Cada delimitador cerrado
+ *
+ * Si son del mismo "tipo" retornara true
+ */
+fun comprobarAbiertoConCerrado(abierto: Char, cerrado: Char): Boolean {
+    if ((abierto == '[' && cerrado == ']') || (abierto == '(' && cerrado == ')') || (abierto == '{' && cerrado == '}')) {
         return true;
     }
-
-   // Si la longitud de la lista es impar querra decir que no se ha encontrado un delimitador de cierre
-   // Si el primer valor de la lista es false querra decir que se ha encontrado un delimitador cerrado que uno abierto
-    if (delimitador.size % 2 != 0 || !delimitador[0]) {
-        return false;
-    }
-
-    val nDelimitadoresAbiertos = delimitador.count { it }
-    val nDelimitadoresCerrados = delimitador.count { !it }
-
-    // Si el numero de delimitadores abiertos es distinto que el numero de delimitadores cerrados significara que hay algun delimitador erroneo
-    if (nDelimitadoresAbiertos != nDelimitadoresCerrados) {
-        return false;
-    }
-
-    var abierto: Boolean = false;
-    for (i in 0..delimitador.size - 2) {
-        if (delimitador[i]) {
-            abierto = true;
-        } else {
-            abierto = false;
-        }
-
-        if (abierto && !delimitador[i] && delimitador[i + 1]) {
-            return false;
-        }
-    }
-
-    return true;
+    return false;
 }
