@@ -14,8 +14,48 @@ fun main () {
 }
 
 fun analizeMatrix(matrix: MutableList<MutableList<String>>): String? {
-    var winner: String? = null;
+    if (estaDesproporcionado(matrix)) {
+        return null;
+    }
 
+    val column_1: List<String> = listOf(matrix[0][0], matrix[1][0], matrix[2][0])
+    val column_2: List<String> = listOf(matrix[0][1], matrix[1][1], matrix[2][1])
+    val column_3: List<String> = listOf(matrix[0][2], matrix[1][2], matrix[2][2])
+
+    val diagonalLeft: List<String> = listOf(matrix[0][0], matrix[1][1], matrix[2][2])
+    val diagonalRight: List<String> = listOf(matrix[0][2], matrix[1][1], matrix[2][0])
+
+    val colsAndDiagonals: MutableList<List<String>> = mutableListOf();
+    colsAndDiagonals.add(column_1);
+    colsAndDiagonals.add(column_2);
+    colsAndDiagonals.add(column_3);
+    colsAndDiagonals.add(diagonalRight);
+    colsAndDiagonals.add(diagonalLeft);
+
+    val winner: String = comprobarGanador(colsAndDiagonals) ?: return "EMPATE";
+
+    return winner;
+}
+
+fun comprobarGanador(allPosibilities: List<List<String>>): String? {
+    var winner: String? = null;
+    for (posibility in allPosibilities) {
+        if (posibility.count { it == "X" } == 3 || posibility.count{ it == "O" } == 3) {
+            winner?.let {
+                if (winner != posibility[0]) {
+                    print("Hay un error en la matriz y han ganado los 2 jugadores ")
+                    return null;
+                }
+            } ?: run {
+                winner = posibility[0];
+            }
+        }
+    }
+
+    return winner;
+}
+
+fun estaDesproporcionado(matrix: MutableList<MutableList<String>>): Boolean {
     var xCount: Int = 0;
     var oCount: Int = 0;
 
@@ -31,80 +71,8 @@ fun analizeMatrix(matrix: MutableList<MutableList<String>>): String? {
 
     if ((xCount > oCount && oCount + 1 != xCount) || (xCount < oCount && xCount + 1 != oCount)) {
         println("Los elementos estan desproporcionados")
-        return null;
+        return true;
     }
 
-    val column_1: List<String> = listOf(matrix[0][0], matrix[1][0], matrix[2][0])
-    val column_2: List<String> = listOf(matrix[0][1], matrix[1][1], matrix[2][1])
-    val column_3: List<String> = listOf(matrix[0][2], matrix[1][2], matrix[2][2])
-
-    val diagonalLeft: List<String> = listOf(matrix[0][0], matrix[1][1], matrix[2][2])
-    val diagonalRight: List<String> = listOf(matrix[0][2], matrix[1][1], matrix[2][0])
-
-    if (column_1.count { it == "X" } == 3 || column_1.count { it == "O" } == 3) {
-        winner = column_1[0];
-    }
-
-    if (column_2.count { it == "X" } == 3 || column_2.count { it == "O" } == 3) {
-        winner?.let {
-            if (winner != column_2[0]) {
-                print("Hay un error en la matriz y han ganado los 2 jugadores ")
-                return null;
-            }
-        } ?: run {
-            winner = column_2[0];
-        }
-    }
-
-    if (column_3.count { it == "X" } == 3 || column_3.count { it == "O" } == 3) {
-        winner?.let {
-            if (winner != column_3[0]) {
-                print("Hay un error en la matriz y han ganado los 2 jugadores ")
-                return null;
-            }
-        } ?: run {
-            winner = column_3[0];
-        }
-    }
-
-    if (diagonalLeft.count { it == "X" } == 3 || diagonalLeft.count { it == "O" } == 3) {
-        winner?.let {
-            if (winner != diagonalLeft[0]) {
-                print("Hay un error en la matriz y han ganado los 2 jugadores ")
-                return null;
-            }
-        } ?: run {
-            winner = diagonalLeft[0];
-        }
-    }
-
-    if (diagonalRight.count { it == "X" } == 3 || diagonalRight.count { it == "O" } == 3) {
-        winner?.let {
-            if (winner != diagonalRight[0]) {
-                print("Hay un error en la matriz y han ganado los 2 jugadores ")
-                return null;
-            }
-        } ?: run {
-            winner = diagonalRight[0];
-        }
-    }
-
-    for (row in matrix) {
-        if (row.count { it == "X" } == 3 || row.count{ it == "O" } == 3) {
-            winner?.let {
-                if (winner != row[0]) {
-                    print("Hay un error en la matriz y han ganado los 2 jugadores ")
-                    return null;
-                }
-            } ?: run {
-                winner = row[0];
-            }
-        }
-    }
-
-    winner?.let {
-        return winner;
-    }
-
-    return "EMPATE";
+    return false;
 }
