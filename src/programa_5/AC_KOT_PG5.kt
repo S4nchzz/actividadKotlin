@@ -32,6 +32,10 @@ fun analizeMatrix(matrix: MutableList<MutableList<String>>): String? {
     colsAndDiagonals.add(diagonalRight);
     colsAndDiagonals.add(diagonalLeft);
 
+    for (row in matrix) {
+        colsAndDiagonals.add(listOf(row[0], row[1], row[2]));
+    }
+
     val winner: String = comprobarGanador(colsAndDiagonals) ?: return "EMPATE";
 
     return winner;
